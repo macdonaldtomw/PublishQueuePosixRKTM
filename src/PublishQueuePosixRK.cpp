@@ -90,8 +90,6 @@ bool PublishQueuePosix::publishCommon(const char *eventName, const char *eventDa
         }
         checkQueueLimits();
     }
-
-
     return true;
 }
 
@@ -211,8 +209,10 @@ void PublishQueuePosix::clearQueues() {
 }
 
 void PublishQueuePosix::setPausePublishing(bool value) { 
+    if(value != this->pausePublishing){
+        _log.info("Posix queue = %s", value ? "paused" : "resumed");
+    }
     pausePublishing = value; 
-
     if (!value) {
         // When resuming publishing, update the canSleep flag
         if (getNumEvents() != 0) {
@@ -261,8 +261,12 @@ size_t PublishQueuePosix::getNumEvents() {
     return result;
 }
 
+bool PublishQueuePosix::sending(){
+    return publishBusy;
+}
+
 void PublishQueuePosix::publishCompleteCallback(bool succeeded, const char *eventName, const char *eventData) {
-    publishComplete = true;
+    publishBusy = false;
     publishSuccess = succeeded;
 }
 
@@ -317,7 +321,7 @@ void PublishQueuePosix::stateWait() {
     if (curEvent) {
         stateTime = millis();
         stateHandler = &PublishQueuePosix::statePublishWait;
-        publishComplete = false;
+        publishBusy = true;
         publishSuccess = false;
         canSleep = false;
 
@@ -337,7 +341,7 @@ void PublishQueuePosix::stateWait() {
     }
 }
 void PublishQueuePosix::statePublishWait() {
-    if (!publishComplete) {
+    if (publishBusy) {
         return;
     }
 
