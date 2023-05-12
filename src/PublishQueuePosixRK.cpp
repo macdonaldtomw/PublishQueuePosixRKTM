@@ -265,9 +265,24 @@ bool PublishQueuePosix::sending(){
     return publishBusy;
 }
 
+unsigned long PublishQueuePosix::failCounter(){
+    return failCount;
+}
+
+unsigned long PublishQueuePosix::deliveredCounter(){
+    return successCount;
+}
+
+void PublishQueuePosix::resetCounters(){
+    failCount = 0;
+    successCount = 0;
+}
+
 void PublishQueuePosix::publishCompleteCallback(bool succeeded, const char *eventName, const char *eventData) {
     publishBusy = false;
     publishSuccess = succeeded;
+    if(publishSuccess) successCount++;
+    else failCount++;
 }
 
 
