@@ -391,7 +391,7 @@ protected:
     int curFileNum = 0; //!< Current file number being published (0 if from RAM queue)
     unsigned long stateTime = 0; //!< millis() value when entering the state, used for stateWait
     unsigned long durationMs = 0; //!< how long to wait before publishing in milliseconds, used in stateWait
-    bool publishBusy = false; //!< true if the publish has completed (successfully or not)
+    bool publishBusy = false; //!< true if the BackgroundPublishQueue thread is handling a request from this instance
     bool publishSuccess = false; //!< true if the publish succeeded
     bool pausePublishing = false; //!< flag to pause publishing (used from automated test)
     bool canSleep = false; //!< returns true if this is a good time to go to sleep
